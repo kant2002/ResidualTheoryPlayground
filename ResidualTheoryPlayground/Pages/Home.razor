@@ -27,25 +27,51 @@
                         {
                             <th>@c</th>
                         }
+                        <th>Stressor Score</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var ps in Model.PlannedStressors)
                     {
                         int j = 0;
+                        var score = 0;
                         <tr>
                             <th>@ps</th>
                             @foreach (var c in components)
                             {
                                 int stressorIndex = i;
                                 int componentIndex = j;
-                                <td @onclick="() => Model.ToggleResidue(modelTest, stressorIndex, componentIndex)">@(testResult.ResidueMatrix[i, j] ? 1 : 0)</td>
+                                var currentValue = testResult.ResidueMatrix[i, j] ? 1 : 0;
+                                score += currentValue;
+                                <td @onclick="() => Model.ToggleResidue(modelTest, stressorIndex, componentIndex)">@currentValue</td>
                                 j++;
                             }
+                            <th>@score</th>
                         </tr>
                         i++;
                     }
                 </tbody>
+                <tfoot>
+                    <tr class="bg-warning">
+                        <th></th>
+                        @{
+                            var totalScore = 0;
+                            int k = 0;
+                        }
+                        @foreach (var c in components)
+                        {
+                            var score = 0;
+                            for (var j = 0; j < Model.UnplannedStressors.Count; j++)
+                            {
+                                score += testResult.ResidueMatrix[Model.PlannedStressors.Count + j, k] ? 1 : 0;
+                            }
+                            totalScore += score;
+                            <th>@score</th>
+                            k++;
+                        }
+                        <th>@totalScore</th>
+                    </tr>
+                </tfoot>
             </table>
             <h2>Unplanned stressors</h2>
             <table>
@@ -56,23 +82,51 @@
                         {
                             <th>@c</th>
                         }
+                        <th>Stressor Score</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var ps in Model.UnplannedStressors)
                     {
                         int j = 0;
+                        var score = 0;
                         <tr class="bg-warning">
                             <th>@ps</th>
                             @foreach (var c in components)
                             {
-                                <td>@(testResult.ResidueMatrix[i, j] ? 1 : 0)</td>
+                                int stressorIndex = i;
+                                int componentIndex = j;
+                                var currentValue = testResult.ResidueMatrix[i, j] ? 1 : 0;
+                                score += currentValue;
+                                <td @onclick="() => Model.ToggleResidue(modelTest, stressorIndex, componentIndex)">@currentValue</td>
                                 j++;
                             }
+                            <th>@score</th>
                         </tr>
                         i++;
                     }
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        @{
+                            totalScore = 0;
+                            k = 0;
+                        }
+                        @foreach (var c in components)
+                        {
+                            var score = 0;
+                            for (var j = 0; j < Model.UnplannedStressors.Count; j++)
+                            {
+                                score += testResult.ResidueMatrix[Model.PlannedStressors.Count + j, k] ? 1 : 0;
+                            }
+                            totalScore += score;
+                            <th>@score</th>
+                            k++;
+                        }
+                        <th>@totalScore</th>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
