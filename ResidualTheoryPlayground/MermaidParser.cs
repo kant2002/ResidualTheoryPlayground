@@ -14,11 +14,6 @@ public class MermaidParser
         foreach (var part in parts.Skip(1))
         {
             var items = part.Split("-->", StringSplitOptions.TrimEntries);
-            if (items.Length == 1)
-            {
-                throw new System.FormatException();
-            }
-
             foreach (var component in items)
             {
                 if (component.Contains("["))

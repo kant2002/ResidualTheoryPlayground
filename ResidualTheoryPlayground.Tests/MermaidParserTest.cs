@@ -4,13 +4,6 @@
 public sealed class MermaidParserTest
 {
     [TestMethod]
-    public void InvalidDiagramThrowError()
-    {
-        var parser = new MermaidParser();
-        var invalidDiagram = "graph TB\nA-->B\nInvalidLine\nC-->D";
-        Assert.Throws<FormatException>(() => parser.GetBlocks(invalidDiagram));
-    }
-    [TestMethod]
     public void MissingHeaderDiagramThrowError()
     {
         var parser = new MermaidParser();
@@ -61,5 +54,20 @@ public sealed class MermaidParserTest
         var components = parser.GetBlocks(invalidDiagram);
 
         CollectionAssert.AreEquivalent(new string[] { "Name", "B", "Name with quotes" }, components);
+    }
+    [TestMethod]
+    public void SingleBlockDiagramThrowError()
+    {
+        var parser = new MermaidParser();
+        var invalidDiagram =
+            """
+            graph TB
+            A
+            B-->C["Name with quotes"]
+            """;
+
+        var components = parser.GetBlocks(invalidDiagram);
+
+        CollectionAssert.AreEquivalent(new string[] { "A", "B", "Name with quotes" }, components);
     }
 }

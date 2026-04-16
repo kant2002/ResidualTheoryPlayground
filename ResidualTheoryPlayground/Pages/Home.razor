@@ -6,17 +6,65 @@
 
 <h1>Result of the residue analysis!</h1>
 
-<div class="row">
-    <div class="col">
-        <h2>Original system</h2>
-        <MermaidDiagram Definition="@Model.OriginalModel" />
+@foreach (var modelTest in Model.Models)
+{
+    var components = Model.GetModelComponents(modelTest);
+    
+    <div class="row">
+        <div class="col">
+            <h2>@modelTest.Name</h2>
+            <MermaidDiagram Definition="@modelTest.Model" />
+        </div>
+        <div class="col">
+            <h2>Planned stressors</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stressors</th>
+                        @foreach (var c in components)
+                        {
+                            <th>@c</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ps in Model.PlannedStressors)
+                    {
+                        <tr>
+                            <th>@ps</th>
+                            @foreach (var c in components)
+                            {
+                                <td>0</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <h2>Unplanned stressors</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stressors</th>
+                        @foreach (var c in components)
+                        {
+                            <th>@c</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ps in Model.UnplannedStressors)
+                    {
+                        <tr class="bg-warning">
+                            <th>@ps</th>
+                            @foreach (var c in components)
+                            {
+                                <td>0</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div class="col">        
-        <h2>Planned stressors</h2>
-        <h2>Unplanned stressors</h2>
-    </div>
-    <div class="col">        
-        <h2>New system</h2>
-        <MermaidDiagram Definition="@Model.NewModel" />
-    </div>
-</div>
+    <hr />
+}
