@@ -4,5 +4,6 @@
     <File Path=".gitignore" />
     <File Path="README.md" />
   </Folder>
+  <Project Path="ResidualTheoryPlayground.Tests/ResidualTheoryPlayground.Tests.csproj" />
   <Project Path="ResidualTheoryPlayground/ResidualTheoryPlayground.csproj" />
 </Solution>
