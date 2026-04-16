@@ -38,7 +38,7 @@ jobs:
       - name: Test
         run: dotnet test -c Release --no-build --verbosity normal
       - name: Publish
-        run: dotnet publish Kyiv/Kyiv.csproj -c Release -o release --verbosity normal
+        run: dotnet publish ResidualTheoryPlayground/ResidualTheoryPlayground.csproj -c Release -o release --verbosity normal
       - name: Change base-tag in index.html from / to ResidualTheoryPlayground
         run: sed -i 's/<base href="\/" \/>/<base href="\/ResidualTheoryPlayground\/" \/>/g' release/wwwroot/index.html
       - name: Add .nojekyll file
