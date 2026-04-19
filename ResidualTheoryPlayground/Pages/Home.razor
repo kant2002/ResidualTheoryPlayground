@@ -6,11 +6,21 @@
 
 <h1>Result of the residue analysis!</h1>
 
+<div class="form-check">
+    <InputCheckbox class="form-check-input" @bind-Value="@assumeRequirementsSatisfied" />
+    <label class="form-check-label" for="checkChecked">
+        Assume all requirements satisfied.
+    </label>
+</div>
+
+
 @foreach (var modelTest in Model.Models)
 {
     var components = Model.GetModelComponents(modelTest);
     var testResult = Model.GetModelTestResult(modelTest);
     int i = 0;
+    var totalScore = 0;
+    int k = 0;
                         
     <div class="row">
         <div class="col">
@@ -18,61 +28,61 @@
             <MermaidDiagram Definition="@modelTest.Model" />
         </div>
         <div class="col">
-            <h2>Planned stressors</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Stressors</th>
-                        @foreach (var c in components)
-                        {
-                            <th>@c</th>
-                        }
-                        <th>Stressor Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var ps in Model.PlannedStressors)
-                    {
-                        int j = 0;
-                        var score = 0;
+            @if (!assumeRequirementsSatisfied)
+            {
+                <h2>Planned stressors</h2>
+                <table>
+                    <thead>
                         <tr>
-                            <th>@ps</th>
+                            <th>Stressors</th>
                             @foreach (var c in components)
                             {
-                                int stressorIndex = i;
-                                int componentIndex = j;
-                                var currentValue = testResult.ResidueMatrix[i, j] ? 1 : 0;
-                                score += currentValue;
-                                <td @onclick="() => Model.ToggleResidue(modelTest, stressorIndex, componentIndex)">@currentValue</td>
-                                j++;
+                                <th>@c</th>
                             }
-                            <th>@score</th>
+                            <th>Stressor Score</th>
                         </tr>
-                        i++;
-                    }
-                </tbody>
-                <tfoot>
-                    <tr class="bg-warning">
-                        <th></th>
-                        @{
-                            var totalScore = 0;
-                            int k = 0;
-                        }
-                        @foreach (var c in components)
+                    </thead>
+                    <tbody>
+                        @foreach (var ps in Model.PlannedStressors)
                         {
+                            int j = 0;
                             var score = 0;
-                            for (var j = 0; j < Model.UnplannedStressors.Count; j++)
-                            {
-                                score += testResult.ResidueMatrix[Model.PlannedStressors.Count + j, k] ? 1 : 0;
-                            }
-                            totalScore += score;
-                            <th>@score</th>
-                            k++;
+                            <tr>
+                                <th>@ps</th>
+                                @foreach (var c in components)
+                                {
+                                    int stressorIndex = i;
+                                    int componentIndex = j;
+                                    var currentValue = testResult.ResidueMatrix[i, j] ? 1 : 0;
+                                    score += currentValue;
+                                    <td @onclick="() => Model.ToggleResidue(modelTest, stressorIndex, componentIndex)">@currentValue</td>
+                                    j++;
+                                }
+                                <th>@score</th>
+                            </tr>
+                            i++;
                         }
-                        <th>@totalScore</th>
-                    </tr>
-                </tfoot>
-            </table>
+                    </tbody>
+                    <tfoot>
+                        <tr class="bg-warning">
+                            <th></th>
+                            @foreach (var c in components)
+                            {
+                                var score = 0;
+                                for (var j = 0; j < Model.UnplannedStressors.Count; j++)
+                                {
+                                    score += testResult.ResidueMatrix[Model.PlannedStressors.Count + j, k] ? 1 : 0;
+                                }
+                                totalScore += score;
+                                <th>@score</th>
+                                k++;
+                            }
+                            <th>@totalScore</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            }
+
             <h2>Unplanned stressors</h2>
             <table>
                 <thead>
@@ -94,9 +104,9 @@
                             <th>@ps</th>
                             @foreach (var c in components)
                             {
-                                int stressorIndex = i;
+                                int stressorIndex = Model.PlannedStressors.Count + i;
                                 int componentIndex = j;
-                                var currentValue = testResult.ResidueMatrix[i, j] ? 1 : 0;
+                                var currentValue = testResult.ResidueMatrix[stressorIndex, componentIndex] ? 1 : 0;
                                 score += currentValue;
                                 <td @onclick="() => Model.ToggleResidue(modelTest, stressorIndex, componentIndex)">@currentValue</td>
                                 j++;
@@ -110,7 +120,7 @@
                     <tr>
                         <th></th>
                         @{
-                            totalScore = 0;
+                            var unplannedTotalScore = 0;
                             k = 0;
                         }
                         @foreach (var c in components)
@@ -120,15 +130,24 @@
                             {
                                 score += testResult.ResidueMatrix[Model.PlannedStressors.Count + j, k] ? 1 : 0;
                             }
-                            totalScore += score;
+                            unplannedTotalScore += score;
                             <th>@score</th>
                             k++;
                         }
-                        <th>@totalScore</th>
+                        <th>@unplannedTotalScore</th>
                     </tr>
                 </tfoot>
             </table>
         </div>
     </div>
     <hr />
+}
+
+@code {
+    bool assumeRequirementsSatisfied = true;
+
+    void ToggleRequirementSatisfied()
+    {
+        assumeRequirementsSatisfied = !assumeRequirementsSatisfied;
+    }
 }
